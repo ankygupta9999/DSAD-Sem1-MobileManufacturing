@@ -11,11 +11,10 @@ import Mobile
 class MobileManufacturing:
     
     def _trackMobiles(self, mobiles, mobile):
-        '''This function reads from the inputPS1.txt file the ids of employees entering and leaving the organization premises. 
-        One employee id should be populated per line (in the input text file) indicating their swipe (entry or exit). 
-        The input data is used to populate the tree. If the employee id is already added to the tree, 
-        then the attendance counter is incremented for every subsequent occurrence of that employee id in the input file. 
-        Use a trigger function to call this recursive function from the root node.
+        '''This function reads from the inputPS1.txt file the mobile ids, oarts manufactoring and assembly time.
+        The input data is used to populate the AVL tree. To apply greedy algorithm to select the mobile 
+        ‘parts manufacturing’ and ‘assembling’ in such a way that total production time is minimized,
+        AVL tree has been constructed using parts manufacturing time as the key of the tree.
         '''
         mobileData = mobile.split('/')
         if(mobiles is None):
@@ -24,39 +23,35 @@ class MobileManufacturing:
         return mobiles  
     
     def _displayMobiles(self, mobiles):
-        '''This function reads from the inputPS1.txt file the ids of employees entering and leaving the organization premises. 
-        One employee id should be populated per line (in the input text file) indicating their swipe (entry or exit). 
-        The input data is used to populate the tree. If the employee id is already added to the tree, 
-        then the attendance counter is incremented for every subsequent occurrence of that employee id in the input file. 
-        Use a trigger function to call this recursive function from the root node.
+        '''This function calculate the order in which given mobiles shall be produced. Calculated result is stored
+        in outputPS1.txt file.
         '''
         mobileOrder = mobiles.inorder_traverse()
-        print('Mobiles should be produced in the order: ' + str(mobileOrder)[1:-1])
         rptOut = 'Mobiles should be produced in the order: ' + str(mobileOrder)[1:-1] + '\n'
         outFile.write(rptOut)
     
-    def _displayProductionTme(self, mobiles):
-        '''This function reads from the inputPS1.txt file the ids of employees entering and leaving the organization premises. 
-        One employee id should be populated per line (in the input text file) indicating their swipe (entry or exit). 
-        The input data is used to populate the tree. If the employee id is already added to the tree, 
-        then the attendance counter is incremented for every subsequent occurrence of that employee id in the input file. 
-        Use a trigger function to call this recursive function from the root node.
+    def _displayProductionAndIdleTime(self, mobiles):
+        '''This function calculate the production time required to monufacture and assemble all mobiles 
+        and total time assembly machine has been idle. Calculated result is stored in outputPS1.txt file.
         '''
-        productionTme = 0
-        print('Total production time for all mobiles is: ' + str(productionTme))
-        rptOut = 'Total production time for all mobiles is: ' + str(productionTme) + '\n'
-        outFile.write(rptOut)
-    
-    def _displayAssemblyIdleTme(self, mobiles):
-        '''This function reads from the inputPS1.txt file the ids of employees entering and leaving the organization premises. 
-        One employee id should be populated per line (in the input text file) indicating their swipe (entry or exit). 
-        The input data is used to populate the tree. If the employee id is already added to the tree, 
-        then the attendance counter is incremented for every subsequent occurrence of that employee id in the input file. 
-        Use a trigger function to call this recursive function from the root node.
-        '''
-        idleTme = 0
-        print('Idle Time of Assembly unit: ' + str(idleTme))
-        rptOut = 'Idle Time of Assembly unit: ' + str(idleTme) + '\n'
+        productionTime = 0
+        partsRunningTime = 0
+        idleTime = 0
+        mobile = None
+        mobileIds = mobiles.inorder_traverse()
+        for mobileId in mobileIds:
+            mobile = mobiles.search(mobileId)
+            partsRunningTime += mobile.PartsManufTime
+            if productionTime < partsRunningTime:
+                #Assembling unit will be idle. Calculating idle time.
+                currentIdleTime = partsRunningTime - productionTime
+                productionTime += mobile.AssembleTime + currentIdleTime
+                idleTime += currentIdleTime
+            elif productionTime >= partsRunningTime:
+                productionTime += mobile.AssembleTime
+            
+        rptOut = 'Total production time for all mobiles is: ' + str(productionTime) + '\n'
+        rptOut += 'Idle Time of Assembly unit: ' + str(idleTime) + '\n'
         outFile.write(rptOut)
     
     def _closeFiles(self):
@@ -68,11 +63,7 @@ class MobileManufacturing:
         
 if __name__ == "__main__":
     # Declaring and initializing variables
-    Eid = 0
-    eId = 0
     mobiles = None
-    StartId = 0
-    EndId = 0
     inputPS1Empty = False
 
     # Creating instance of Main class
@@ -88,13 +79,12 @@ if __name__ == "__main__":
             mobiles = tracker._trackMobiles(mobiles, str(mobile))
     else:
         inputPS1Empty = True
-        outFile.write("Nothing to process. Swipe data file is empty. Thus, Tree is empty \n")
+        outFile.write("Nothing to process. Mobile manufacturing data file is empty. Thus, Tree is empty \n")
 
     if inputPS1Empty is False:
         # To get the headcount - This will be print at the start of report by default as given in sample output.
         tracker._displayMobiles(mobiles)
-        tracker._displayProductionTme(mobiles)
-        tracker._displayAssemblyIdleTme(mobiles)
+        tracker._displayProductionAndIdleTime(mobiles)
     
     # Closing all the files
     tracker._closeFiles()
