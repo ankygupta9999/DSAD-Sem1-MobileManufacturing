@@ -1,0 +1,136 @@
+InputPS1 load and form AVL tree for Mobiles arranging per their Parts Manufacturing Time:
+----------------------------------------------------------------------------------------
+
+Step 1: Firstly, As we are implementing Greedy Approach, Parts Manufacture time is to be taken as 'key' here while inserting nodes to AVL tree.
+
+ /* Insert mobile elements based on 'Parts Manufacture time' into the AVL tree similar as BST's (Binary Search Tree) insertion logic as shown below. */
+
+    insert(mobileTree, MobileID, PartsManufTime, AssembleTime):
+	
+	/* Accept the current Mobile Tree */
+        tree <- mobileTree
+
+        /* Create new node as per new Mobile details */
+        newMobileNode <- MobileNode(MobileID, PartsManufTime, AssembleTime)
+        
+	/* Check to see where to insert the new node */
+        if tree is None:
+            MobileNode <-- newMobileNode  	// Set as root node
+        
+        else if PartsManufTime < tree.PartsManufTime: 
+            /* Insert the Mobile node on the left hand side of tree */
+	    MobileNode.left.insert(MobileID, PartsManufTime, AssembleTime)	//Attach new mobile to left subtree
+            
+        else if PartsManufTime > tree.PartsManufTime: 
+            MobileNode.right.insert(MobileID, PartsManufTime, AssembleTime)	//Attach new mobile to right subtree
+        else:									// If Parts Manufacture Time is equal, then decide where to add node based on Assemble time
+            if AssembleTime > tree.AssembleTime:
+                MobileNode.left.insert(MobileID, PartsManufTime, AssembleTime)
+            else:
+                MobileNode.right.insert(MobileID, PartsManufTime, AssembleTime)            
+            
+        /* After every new Mobile node insert to mobileTree, check for AVL tree balance.
+	rebalance() 
+	
+Step 2: After inserting the elements, Update the height of the current node. And, then check the Balance Factor of each node. Repeat till tree is balanced.
+    rebalance():
+	update_heights()	// Update the height after addition of each node.
+	update_balances()	// Update the balances to see if Tree is balanced or not after addition.
+	
+	while balance < -1 or > 1:
+	    if balance > 1:
+		MobileNode.left.balance < 0:	//then, we are in case II and need to do left rotate first
+		MobileNode.left.leftrotate()
+		update_heights()
+		update_balances()
+	    rightrotate()			// becomes case I, do right rotate 
+	    update_heights()
+	    update_balances()
+	    if balance < 1:
+		MobileNode.left.balance > 0:	//then, we are in case III and need to do right rotate first
+		MobileNode.left.rightrotate()
+		update_heights()
+		update_balances()
+	    leftrotate()			// becomes case IV, left rotate.
+	    update_heights()
+	    update_balances()	    
+
+    update_heights():
+        if not MobileNode == None: 
+            height = max(MobileNode.left.height, MobileNode.right.height) + 1 
+        else: 
+            height = -1 	
+
+    update_balances():
+        if not MobileNode == None:
+            balance = MobileNode.left.height - MobileNode.right.height 
+        else: 
+            balance = 0 
+
+    lrotate():
+        # Rotate left pivoting on self
+        A <- MobileNode 
+        B <- MobileNode.right.MobileNode 
+        T <- B.left.MobileNode 
+        
+        MobileNode <- B 
+        B.left.MobileNode <- A 
+        A.right.MobileNode <- T 
+
+    rrotate():
+        # Rotate left pivoting on self
+        A <- MobileNode 
+        B <- MobileNode.left.MobileNode 
+        T <- B.right.MobileNode 
+        
+        MobileNode <- B 
+        B.right.MobileNode <- A 
+        A.left.MobileNode <- T 
+
+
+Step 3: When the Balance Factor of every node will be found like 0 or 1 or -1 then the algorithm will proceed for the next operation and Repeat Step 1 to Step 2 till all mobiles are inserted.
+
+==================================================================================
+
+Algo to minimize and Calculate Manufacturing and Assembly time:
+--------------------------------------------------------------
+
+Step 1: First, do an InOrder traversal of tree to get the nodes in order of their Parts manufacturing time in a list.
+
+inorder(mobileTree tree)
+{
+	if (tree == null):
+		return []
+
+	inlist[] = []		// take the list
+        if (tree != null) { 
+           inorder(tree.left); // process left node first as inorder traversal does
+           
+	   process tree		// process parent
+
+           inorder(tree.right); 
+        }
+	return inlist[];
+}
+
+Step 2: Then, take a MobileID and Update production time and Idle time based on current MobileIds production time and assemble time.
+
+productionOrder = []	// Captures the order in which mobiles should be produced to optimize production time as per Greedy algorithm.
+productionTime = []	// captures the production time.
+idleTime = []		// captures the idle time of assembly unit.
+for mobile in inlist:
+	productionOrder.append(mobile.MobileID)
+        partsRunningTime += mobile.PartsManufTime
+        if productionTime < partsRunningTime:
+            #Assembling unit will be idle. Calculating idle time.
+            currentIdleTime = partsRunningTime - productionTime
+            productionTime += mobile.AssembleTime + currentIdleTime
+            idleTime += currentIdleTime
+        elif productionTime >= partsRunningTime:
+            productionTime += mobile.AssembleTime
+    
+Step 3: Repeat Step 2 till all Mobiles are checked.
+
+Step 4: Print total production Time for all mobiles and Idle time of Assembly unit.
+
+==================================================================================
