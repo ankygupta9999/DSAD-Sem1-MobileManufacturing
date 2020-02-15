@@ -41,8 +41,14 @@ class MobileTree():
         elif PartsManufTime < tree.PartsManufTime: 
             self.MobileNode.left.insert(MobileID, PartsManufTime, AssembleTime)
             
-        elif PartsManufTime >= tree.PartsManufTime: 
+        elif PartsManufTime > tree.PartsManufTime: 
             self.MobileNode.right.insert(MobileID, PartsManufTime, AssembleTime)
+        else:
+            if AssembleTime > tree.AssembleTime:
+                self.MobileNode.left.insert(MobileID, PartsManufTime, AssembleTime)
+            else:
+                self.MobileNode.right.insert(MobileID, PartsManufTime, AssembleTime)
+            
             
         self.rebalance() 
         
@@ -119,18 +125,6 @@ class MobileTree():
             self.balance = self.MobileNode.left.height - self.MobileNode.right.height 
         else: 
             self.balance = 0 
-
-    def search(self, MobileID):
-        Mobile = None
-        tree = self.MobileNode
-        if tree is not None:
-            if int(tree.MobileID) == int(MobileID):
-                Mobile = tree
-            if Mobile is None and tree.left is not None:
-                Mobile = tree.left.search(MobileID)
-            if Mobile is None and tree.right is not None:
-                Mobile = tree.right.search(MobileID)
-        return Mobile
     
     def inorder_traverse(self):
         if self.MobileNode == None:
@@ -141,7 +135,7 @@ class MobileTree():
         for i in l: 
             inlist.append(i) 
 
-        inlist.append(self.MobileNode.MobileID)
+        inlist.append(self.MobileNode)
 
         l = self.MobileNode.right.inorder_traverse()
         for i in l: 

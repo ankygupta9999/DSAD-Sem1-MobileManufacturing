@@ -22,25 +22,18 @@ class MobileManufacturing:
         mobiles.insert(int(mobileData[0]), int(mobileData[1]), int(mobileData[2]))
         return mobiles  
     
-    def _displayMobiles(self, mobiles):
-        '''This function calculate the order in which given mobiles shall be produced. Calculated result is stored
-        in outputPS1.txt file.
-        '''
-        mobileOrder = mobiles.inorder_traverse()
-        rptOut = 'Mobiles should be produced in the order: ' + str(mobileOrder)[1:-1] + '\n'
-        outFile.write(rptOut)
-    
-    def _displayProductionAndIdleTime(self, mobiles):
+    def _displayOrderAndTime(self, mobiles):
         '''This function calculate the production time required to monufacture and assemble all mobiles 
         and total time assembly machine has been idle. Calculated result is stored in outputPS1.txt file.
         '''
+        productionOrder = []
         productionTime = 0
         partsRunningTime = 0
         idleTime = 0
         mobile = None
-        mobileIds = mobiles.inorder_traverse()
-        for mobileId in mobileIds:
-            mobile = mobiles.search(mobileId)
+        mobiles = mobiles.inorder_traverse()
+        for mobile in mobiles:
+            productionOrder.append(mobile.MobileID)
             partsRunningTime += mobile.PartsManufTime
             if productionTime < partsRunningTime:
                 #Assembling unit will be idle. Calculating idle time.
@@ -49,8 +42,9 @@ class MobileManufacturing:
                 idleTime += currentIdleTime
             elif productionTime >= partsRunningTime:
                 productionTime += mobile.AssembleTime
-            
-        rptOut = 'Total production time for all mobiles is: ' + str(productionTime) + '\n'
+        
+        rptOut = 'Mobiles should be produced in the order: ' + str(productionOrder)[1:-1] + '\n'    
+        rptOut += 'Total production time for all mobiles is: ' + str(productionTime) + '\n'
         rptOut += 'Idle Time of Assembly unit: ' + str(idleTime) + '\n'
         outFile.write(rptOut)
     
@@ -83,8 +77,7 @@ if __name__ == "__main__":
 
     if inputPS1Empty is False:
         # To get the headcount - This will be print at the start of report by default as given in sample output.
-        tracker._displayMobiles(mobiles)
-        tracker._displayProductionAndIdleTime(mobiles)
+        tracker._displayOrderAndTime(mobiles)
     
     # Closing all the files
     tracker._closeFiles()
